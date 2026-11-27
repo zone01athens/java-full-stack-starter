@@ -14,10 +14,22 @@ if [[ -z $order ]]; then
   echo 'No quest exercises found in PATH.md.' >&2
   exit 1
 fi
+# Bind a pass to the names and bytes the runner mounts into the tester.
+source_revision() {
+  local file
+  (
+    cd "$1"
+    for file in ./*.java; do
+      [[ -f $file ]] || return 1
+      printf '%s\0' "$file"
+      git hash-object --no-filters -- "$file" || return 1
+    done
+  ) | git hash-object --stdin
+}
 next_exercise() {
-  local item
+  local item revision
   while IFS= read -r item; do
-    if [[ ! -f "$progress/$item" ]]; then
+    if [[ ! -s "$progress/$item" ]] || ! revision=$(source_revision "$root/$item") || [[ $(<"$progress/$item") != "$revision" ]]; then
       printf '%s\n' "$item"
       return
     fi
@@ -41,6 +53,15 @@ if ! compgen -G "$folder/*.java" >/dev/null; then
   exit 2
 fi
 folder=$(cd "$folder" && pwd)
+# Show the first unfinished file with its line number, as an IDE console link.
+if todo=$(LC_ALL=C grep -nHw -m 1 TODO "$folder"/*.java); then
+  printf 'PENDING %s\n%s\n' "$exercise" "${todo%%$'\n'*}"
+  if [[ ${1:-next} == next ]]; then exit 0; else exit 2; fi
+else
+  status=$?
+  [[ $status == 1 ]] || exit "$status"
+fi
+revision=$(source_revision "$folder")
 engine=${CONTAINER_ENGINE:-docker}
 if [[ -z ${CONTAINER_ENGINE:-} ]] && ! command -v docker >/dev/null && command -v podman >/dev/null; then
   engine=podman
@@ -84,7 +105,13 @@ fi
 
 if [[ -d "$root/$exercise" && $folder == "$(cd "$root/$exercise" && pwd)" ]] && grep -Fxq "$exercise" <<< "$order"; then
   mkdir -p "$progress"
-  touch "$progress/$exercise"
+  if [[ $(source_revision "$folder") != "$revision" ]]; then
+    echo 'Source changed during the test. Run again to record a pass.' >&2
+    exit 1
+  fi
+  marker=$(mktemp "$progress/.$exercise.XXXXXX")
+  printf '%s\n' "$revision" > "$marker"
+  mv -f "$marker" "$progress/$exercise"
   next=$(next_exercise)
   printf 'PASS: %s. Next: %s\n' "$exercise" "${next:-all local quest tests complete}"
 else

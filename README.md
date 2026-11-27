@@ -31,7 +31,7 @@ Expected output: `linux/amd64`. For Podman, replace `docker` with `podman` in bo
 
 ## Test a piscine exercise
 
-Use the exact exercise name, filename, package, and Java version specified in the Platform brief. Place the Java files directly under `<Exercise>/` at the repository root. For example, use `HelloWorld/HelloWorld.java`.
+Use the exact exercise name, filename, package, and Java version specified in the Platform brief. Implement the provided Java stubs directly under `<Exercise>/` at the repository root. For example, use `HelloWorld/HelloWorld.java`.
 
 Start Docker or Podman with `linux/amd64` support. On Apple Silicon, enable amd64 emulation. Run the tester from the repository root:
 
@@ -54,7 +54,7 @@ The IntelliJ console shows the exercise and its result. On failure, open the pri
 
 Use `mvn test` for the local build and setup tests. The official tester runs only when explicitly invoked.
 
-A successful run against the exercise in this checkout records a marker under `.piscine-progress/`, scoped to the tester image. Git ignores these markers. With **Java Piscine** selected, press **Shift+F10** to run. If the next folder is empty, the runner prints its path and waits for your solution. Only a tester pass advances the sequence. Checkpoints, raids and official results are tracked on the Platform.
+A successful run against the exercise in this checkout records a marker under `.piscine-progress/`, scoped to the tester image. Git ignores these markers. With **Java Piscine** selected, press **Shift+F10** to run. A literal `TODO` marker in any top-level Java source keeps that exercise pending. Open the reported file, implement the work and remove the marker. The next run invokes the tester. Only a successful test of the current sources advances the sequence. Editing a passed solution makes it eligible for testing again. Checkpoints, raids and official results are tracked on the Platform.
 
 The runner uses the verified local image and returns the tester’s exit code. If the image is missing, install it from the Zone01 release. Submit each solution as specified in its Platform brief and update your board.
 
