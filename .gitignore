@@ -6,3 +6,5 @@ target/
 
 /.piscine-progress/
 /.piscine-maven.log
+
+/.ai-transcripts/

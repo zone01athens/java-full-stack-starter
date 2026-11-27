@@ -2,6 +2,10 @@
 
 Complete the [13 piscine stages](PATH.md). GitHub tracks work. The Athens Platform records results from its assigned Gitea repositories, checkpoints and audits.
 
+## AI-assisted practice
+
+Use AI for questions, hints and debugging guidance. Implement the exercise yourself and verify that you can explain the result unaided. Read the [tutor rules](AGENTS.md) and [private transcript instructions](transcripts/README.md) before your first assisted session.
+
 ## Set up your workspace
 
 1. Once staff grant board access, copy the [cohort board](https://github.com/orgs/zone01athens/projects/10) to your GitHub account. Select **Make a copy** and enable **Copy draft issues**.
