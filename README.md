@@ -50,9 +50,11 @@ mvn -N exec:exec@piscine              # next exercise without a local pass
 mvn -pl HelloWorld exec:exec@piscine  # selected exercise module
 ```
 
+The IntelliJ console shows the exercise and its result. On failure, open the printed tester log for details. Maven writes its own diagnostics to `.piscine-maven.log` in the repository root. Both logs are ignored by Git. For the same brief output in a terminal, add `-l .piscine-maven.log` to either Maven command above.
+
 Use `mvn test` for the local build and setup tests. The official tester runs only when explicitly invoked.
 
-A successful run against the exercise in this checkout records a marker under `.piscine-progress/`, scoped to the tester image. Git ignores these markers. Failed runs never advance the sequence. Checkpoints, raids and official results are tracked on the Platform.
+A successful run against the exercise in this checkout records a marker under `.piscine-progress/`, scoped to the tester image. Git ignores these markers. With **Java Piscine** selected, press **Shift+F10** to run. If the next folder is empty, the runner prints its path and waits for your solution. Only a tester pass advances the sequence. Checkpoints, raids and official results are tracked on the Platform.
 
 The runner uses the verified local image and returns the tester’s exit code. If the image is missing, install it from the Zone01 release. Submit each solution as specified in its Platform brief and update your board.
 

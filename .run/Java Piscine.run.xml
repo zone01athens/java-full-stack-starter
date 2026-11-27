@@ -3,7 +3,7 @@
     <MavenSettings>
       <option name="myRunnerParameters">
         <MavenRunnerParameters>
-          <option name="goals"><list><option value="-N" /><option value="exec:exec@piscine" /></list></option>
+          <option name="goals"><list><option value="-N" /><option value="-l" /><option value=".piscine-maven.log" /><option value="exec:exec@piscine" /></list></option>
           <option name="pomFileName" value="pom.xml" />
           <option name="workingDirPath" value="$PROJECT_DIR$" />
         </MavenRunnerParameters>

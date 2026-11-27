@@ -97,6 +97,7 @@
         <execution>
           <id>piscine</id>
           <configuration>
+            <inheritIo>true</inheritIo>
             <executable>${piscine.runner}</executable>
             <arguments><argument>${piscine.exercise}</argument></arguments>
           </configuration>
