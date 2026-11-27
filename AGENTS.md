@@ -12,6 +12,6 @@ Apply these rules when assisting a learner with this piscine, including raids. S
 
 For environment problems, give direct help with JDK, Maven, IntelliJ, Git or container setup. Keep exercise implementations untouched. During a checkpoint, exam or restricted audit, stop task-specific help and direct the learner to the proctor. Apply any stricter Platform rules.
 
-## Record the exchange
+## Record learning signals automatically
 
-For coursework practice, tell the learner that their prompts and your visible hints are reviewed in their private GitHub student repository. Follow [the transcript workflow](transcripts/README.md). If you can write files, create the local Markdown record and append the learner's actual prompts and your visible replies in order, including direct-answer requests and redirections. Record only the exercise-related portions; mark omissions explicitly. Never reconstruct missing turns, invent a learner response, or write the learner's reflection. Leave publication to the learner. If file tools are unavailable, provide the entry for them to save.
+For each assisted exercise, explain the anonymous review once. Before ending each tutoring turn run the command in [Practice review](transcripts/README.md) with the current exercise folder and the three evidence levels. Use only observable learner actions in this exchange. Missing evidence is unobserved. Do not store conversation text, identifiers or reflections. Respect a learner's opt-out. Skip setup, exams, staff maintenance and unrelated chats. If you lack shell access, state once that automatic review is unavailable and continue tutoring.

@@ -4,7 +4,7 @@ Complete the [13 piscine stages](PATH.md). GitHub tracks work. The Athens Platfo
 
 ## AI-assisted practice
 
-Use AI for questions, hints and debugging guidance. Implement the exercise yourself and verify that you can explain the result unaided. Read the [tutor rules](AGENTS.md) and [private transcript instructions](transcripts/README.md) before your first assisted session.
+Use AI for questions, hints and debugging guidance. Implement the exercise yourself and verify that you can explain the result unaided. Read the [tutor rules](AGENTS.md) and [automatic practice review instructions](transcripts/README.md) before your first assisted session.
 
 ## Set up your workspace
 

@@ -1,33 +1,38 @@
-# AI practice records
+# Automatic practice review
 
-Use one Markdown file per assisted exercise session. This records how you asked for help, what the tutor said, and what you verified yourself. Independent work needs no fabricated conversation.
+For automatic scoring on every completed turn, use the local tutor from the IntelliJ terminal. Install Ollama and a local model with structured-output support once. Run the Ollama service in local-only mode (OLLAMA_NO_CLOUD=1). Supply the installed model name:
 
-## Capture during practice
+    python3 tools/review/tutor.py HelloWorld --model MODEL
 
-Keep local drafts under `.ai-transcripts/` in your checkout. Git ignores this directory. Use a unique name, for example `2026-11-30-HelloWorld-01.md`. Start from [the session template](SESSION-TEMPLATE.md). A repository-aware tutor can append turns as you work. For web chat or a client without file access, copy the visible exchange yourself. Record the original wording, including unproductive prompts, and label each speaker. Mark missing turns as missing.
+The tutor returns a hint and three rubric values together. The runner validates and records the values before displaying the hint. Dialogue stays in process memory. Type /exit to finish. This runner does not read the exercise source; paste the relevant attempt or error in the chat.
 
-Write your own follow-up. Record the experiment, prediction and actual result. Keep records scoped to the assignment. Redact secrets, personal details and unrelated conversation before saving or sharing. Omit hidden instructions, internal reasoning, raw tool logs and private assessment material. Do not export an entire account's chat history.
+Other shell-enabled repository tutors can record the same levels by following AGENTS.md. The recorder accepts only an exercise folder and three fixed levels. No transcript is exported. The AI client may keep its own chat history under its own settings.
 
-## Submit to your private GitHub copy
+    python3 tools/review/practice.py record HelloWorld demonstrated partial unobserved
 
-1. Open your **private student repository** in GitHub. On first use, create a branch named `ai-transcripts` from your current main branch. Switch to that branch in the browser.
-2. Open its `transcripts/` directory. Use **Add file → Upload files** to upload the reviewed Markdown file. Commit directly to `ai-transcripts`. Check the branch selector before committing.
-3. Link the transcript from the exercise issue in your private student repository. Give the assigned reviewer read access. Keep the transcript branch separate from the code branch throughout the course. Do not merge it into main or push it to Gitea. Continue pushing the same **code** commit to GitHub and Gitea as described in the root README.
+Use the positions in this order:
 
-Only the instructions and blank template belong in the public starter. Repository instructions guide compatible clients; they cannot enforce tutoring in external chats or capture those chats automatically. Disable inline code generation while practising if it supplies implementations.
+| Dimension | Partial | Demonstrated |
+| --- | --- | --- |
+| Framing | Identifies the difficulty | Gives expected and observed behavior or a specific prediction |
+| Decision | Requests a diagnostic hint | Chooses a next experiment and explains why |
+| Verification | Reports running a check | Compares its result with a prediction and explains the outcome |
 
-## Review prompts and learning
+Use **unobserved** when evidence is missing. Score only the learner's contribution. Treat these as tutor estimates for cohort mentoring. Verify independent understanding separately with an unaided exercise.
 
-For each dimension record **demonstrated**, **partial**, or **insufficient evidence**, with a turn number or an observed learner action.
+## Automatic delivery
 
-| Dimension | Evidence to look for |
-| --- | --- |
-| Framing the problem | The learner identifies the confusing behavior, expected result or an initial prediction. |
-| Owning the decision | They ask for an explanation or diagnostic hint, then decide what to try. |
-| Checking the advice | They test a prediction and compare the actual result with it, including when the tutor was wrong. |
-| Independent understanding | They explain their change or handle a small variation unaided during review. |
+Python 3 is required. The ignored local queue retains the strongest observed level per dimension per exercise. An improved score updates the same random sample. Repeated delivery is safe. The tutor attempts delivery after each record. The IntelliJ/Maven tester retries queued changes on each run. Without an intake URL, records stay on the device. No personal commits, uploads or API keys are required.
 
-Example: “With input X I predicted Y but got Z. Which assumption should I check first?” gives the reviewer an observable starting point. A request for a solution can still lead to good learning if the next turns show an independent attempt. Evaluate the sequence; prompt length, English fluency and message count are poor proxies for understanding. Treat an incomplete record as a gap to discuss.
+Staff: run the receiver on an access-controlled campus host with a database outside the checkout:
+
+    python3 tools/review/practice.py serve /var/lib/piscine-review/cohort.sqlite3
+
+Route HTTPS POST /samples to its loopback port 8765. Disable access logs and request tracing throughout the route, and verify infrastructure retention before enabling collection. Set PISCINE_REVIEW_INTAKE to the campus HTTPS URL in the tutor and IDE environments. The receiver stores a random exercise-sample token and three integers. It has no student account, exercise name, timestamp or text field. Different samples have independent tokens. The network edge can see the connection IP. Keep the receiver on the controlled network. Submissions are unauthenticated self-reports.
+
+    python3 tools/review/practice.py report /var/lib/piscine-review/cohort.sqlite3
+
+The report counts exercise samples. Dimension breakdowns appear from five samples onward. One learner may contribute multiple samples. Review participation and scores cannot establish attendance, mastery or cohort membership. Set PISCINE_REVIEW_OFF=1 in the tutor and IDE environments to disable recording and delivery. Browser-only chats and clients that ignore repository instructions provide no automatic evidence.
 
 ## Why this design
 
