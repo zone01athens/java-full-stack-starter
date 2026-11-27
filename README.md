@@ -6,7 +6,7 @@ Complete the [13 piscine stages](PATH.md). GitHub tracks work. The Athens Platfo
 
 1. Once staff grant board access, copy the [cohort board](https://github.com/orgs/zone01athens/projects/10) to your GitHub account. Select **Make a copy** and enable **Copy draft issues**.
 2. Select **Use this template → Create a new repository**. Choose your account and set visibility to **Private** so your solutions stay private.
-3. Clone your copy. Open the Maven project in IntelliJ IDEA, select JDK 17 or later, and sync Maven.
+3. Clone your copy. Open the Maven project in IntelliJ IDEA, select JDK 17 or later, and sync the root `pom.xml`. Each quest exercise imports as a separate Java module. Keep solution files directly in its directory. IntelliJ resolves and compiles each module independently, including exercises that reuse class names.
 4. Run `mvn test` from the repository root. Expect `GreetingTest` to pass. Run `Greeting.main` without arguments to verify console output: `Hello, Athens!`.
 
 ## Install the Zone01 tester once
@@ -41,7 +41,16 @@ Start Docker or Podman with `linux/amd64` support. On Apple Silicon, enable amd6
 
 To rerun a specific exercise, use `./tools/test-exercise HelloWorld`. For a different solution directory, pass its path as the second argument. To select Podman explicitly, prefix the command with `CONTAINER_ENGINE=podman`.
 
-**IntelliJ IDEA.** Enable the Shell Script plugin and select **Java Piscine → Run**. The configuration runs the first quest exercise without a local pass, in PATH.md order. To switch exercises, set **Run → Edit Configurations → Java Piscine → Script options** to the exercise name.
+To compile one exercise without running the tester, use `mvn -pl HelloWorld compile`.
+
+**IntelliJ IDEA.** Select **Java Piscine → Run** to test the next quest exercise. The shared Maven configuration runs the same pinned container as the shell runner. From the repository root:
+
+```sh
+mvn -N exec:exec@piscine              # next exercise without a local pass
+mvn -pl HelloWorld exec:exec@piscine  # selected exercise module
+```
+
+Use `mvn test` for the local build and setup tests. The official tester runs only when explicitly invoked.
 
 A successful run against the exercise in this checkout records a marker under `.piscine-progress/`, scoped to the tester image. Git ignores these markers. Failed runs never advance the sequence. Checkpoints, raids and official results are tracked on the Platform.
 

@@ -1,0 +1,10 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>gr.zone01.athens</groupId>
+    <artifactId>exercise-parent</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <relativePath>../exercise-parent/pom.xml</relativePath>
+  </parent>
+  <artifactId>Strategy</artifactId>
+</project>

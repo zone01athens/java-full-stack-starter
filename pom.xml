@@ -3,18 +3,81 @@
   <groupId>gr.zone01.athens</groupId>
   <artifactId>java-full-stack-starter</artifactId>
   <version>1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <modules>
+    <module>setup</module>
+    <module>exercise-parent</module>
+    <module>HelloWorld</module>
+    <module>IntOperations</module>
+    <module>FloatOperations</module>
+    <module>IsEven</module>
+    <module>Chifoumi</module>
+    <module>StringLength</module>
+    <module>StringConcat</module>
+    <module>StringContains</module>
+    <module>StringReplace</module>
+    <module>CleanExtract</module>
+    <module>Palindrome</module>
+    <module>ComputeArray</module>
+    <module>DoOp</module>
+    <module>SortArgs</module>
+    <module>Cat</module>
+    <module>CatInFile</module>
+    <module>Capitalize</module>
+    <module>FileManager</module>
+    <module>FileSearch</module>
+    <module>StarProperties</module>
+    <module>StarConstructors</module>
+    <module>StarGetters</module>
+    <module>StarStatic</module>
+    <module>StarUtils</module>
+    <module>StarInheritance</module>
+    <module>StarOverride</module>
+    <module>StarPlanet</module>
+    <module>StarGalaxy</module>
+    <module>StarMass</module>
+    <module>AdventureCharacter</module>
+    <module>AdventureUtils</module>
+    <module>AdventureMonster</module>
+    <module>AdventureInterface</module>
+    <module>AdventureSorcerer</module>
+    <module>AdventureTemplar</module>
+    <module>AdventureAbstract</module>
+    <module>AdventureWeapon</module>
+    <module>AdventureException</module>
+    <module>AdventureCatch</module>
+    <module>ListContains</module>
+    <module>ListEquals</module>
+    <module>ListSearchIndex</module>
+    <module>SortList</module>
+    <module>MapInventory</module>
+    <module>MapEquals</module>
+    <module>SetOperations</module>
+    <module>SetEquals</module>
+    <module>StreamCollect</module>
+    <module>StreamMap</module>
+    <module>StreamReduce</module>
+    <module>KeepTheChange</module>
+    <module>Wedding</module>
+    <module>WeddingComplex</module>
+    <module>ParseDate</module>
+    <module>FormatDate</module>
+    <module>RegexMatch</module>
+    <module>RegexReplace</module>
+    <module>DifferenceBetweenDate</module>
+    <module>Singleton</module>
+    <module>Factory</module>
+    <module>Builder</module>
+    <module>Decorator</module>
+    <module>Strategy</module>
+    <module>Observer</module>
+  </modules>
   <properties>
+    <piscine.exercise>next</piscine.exercise>
+    <piscine.runner>${project.basedir}/tools/test-exercise</piscine.runner>
     <maven.compiler.release>17</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
-  <dependencies>
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter</artifactId>
-      <version>5.12.2</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
   <build><plugins>
     <plugin>
       <groupId>org.apache.maven.plugins</groupId>
@@ -25,6 +88,20 @@
       <groupId>org.apache.maven.plugins</groupId>
       <artifactId>maven-surefire-plugin</artifactId>
       <version>3.5.4</version>
+    </plugin>
+    <plugin>
+      <groupId>org.codehaus.mojo</groupId>
+      <artifactId>exec-maven-plugin</artifactId>
+      <version>3.6.3</version>
+      <executions>
+        <execution>
+          <id>piscine</id>
+          <configuration>
+            <executable>${piscine.runner}</executable>
+            <arguments><argument>${piscine.exercise}</argument></arguments>
+          </configuration>
+        </execution>
+      </executions>
     </plugin>
   </plugins></build>
 </project>
