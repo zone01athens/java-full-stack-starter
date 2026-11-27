@@ -1,11 +1,36 @@
 #!/usr/bin/env bash
 set -euo pipefail
-exercise=${1:-}
-if [[ ! $exercise =~ ^[A-Za-z][A-Za-z0-9_]*$ || $# -gt 2 ]]; then
-  echo 'Usage: tools/test-exercise HelloWorld [solution-folder]' >&2
+root=$(cd "$(dirname "$0")/.." && pwd)
+image=sha256:1d751b0b88796c175316ab234c483acf9faef11247b8c584f2422b781d1f1951
+progress="$root/.piscine-progress/${image#sha256:}"
+exercise=${1:-next}
+if [[ ! $exercise =~ ^[A-Za-z][A-Za-z0-9_]*$ || $# -gt 2 || ( $exercise == next && $# -gt 1 ) ]]; then
+  echo 'Usage: tools/test-exercise [next | Exercise [solution-folder]]' >&2
   exit 2
 fi
-root=$(cd "$(dirname "$0")/.." && pwd)
+# PATH.md lists each quest exercise once, in Platform order.
+order=$(sed -nE 's/^\| [^|]+ \| `([A-Za-z][A-Za-z0-9_]*)\/` \|.*$/\1/p' "$root/PATH.md")
+if [[ -z $order ]]; then
+  echo 'No quest exercises found in PATH.md.' >&2
+  exit 1
+fi
+next_exercise() {
+  local item
+  while IFS= read -r item; do
+    if [[ ! -f "$progress/$item" ]]; then
+      printf '%s\n' "$item"
+      return
+    fi
+  done <<< "$order"
+}
+if [[ $exercise == next ]]; then
+  exercise=$(next_exercise)
+  if [[ -z $exercise ]]; then
+    echo 'All local quest tests have passed. Check your results on the Platform.'
+    exit 0
+  fi
+fi
+printf 'Testing %s\n' "$exercise"
 folder=${2:-"$root/$exercise"}
 if ! compgen -G "$folder/*.java" >/dev/null; then
   echo "Place the exercise .java files directly in $folder" >&2
@@ -31,5 +56,12 @@ if ! "$engine" image inspect "$image" >/dev/null 2>&1; then
   echo "Verify the checksum, then run: $engine load -i java-piscine-tester-a0f74962.tar.gz" >&2
   exit 1
 fi
-exec "$engine" run --pull=never --rm --platform linux/amd64 --network none \
+"$engine" run --pull=never --rm --platform linux/amd64 --network none \
   -e "EXERCISE=$exercise" -v "$folder:/app/student/$exercise:ro,Z" "$image"
+
+if [[ -d "$root/$exercise" && $folder == "$(cd "$root/$exercise" && pwd)" ]] && grep -Fxq "$exercise" <<< "$order"; then
+  mkdir -p "$progress"
+  touch "$progress/$exercise"
+  next=$(next_exercise)
+  printf 'Local pass: %s. Next: %s\n' "$exercise" "${next:-all local quest tests complete}"
+fi

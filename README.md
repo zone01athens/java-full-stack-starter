@@ -36,12 +36,14 @@ Use the exact exercise name, filename, package, and Java version specified in th
 Start Docker or Podman with `linux/amd64` support. On Apple Silicon, enable amd64 emulation. Run the tester from the repository root:
 
 ```sh
-./tools/test-exercise HelloWorld
+./tools/test-exercise next
 ```
 
-For a different solution directory, pass its path as the second argument. To select Podman explicitly, prefix the command with `CONTAINER_ENGINE=podman`.
+To rerun a specific exercise, use `./tools/test-exercise HelloWorld`. For a different solution directory, pass its path as the second argument. To select Podman explicitly, prefix the command with `CONTAINER_ENGINE=podman`.
 
-**IntelliJ IDEA.** Enable the Shell Script plugin and select **Java Piscine → Run**. The configuration runs `HelloWorld` by default. To switch exercises, set **Run → Edit Configurations → Java Piscine → Script options** to the exercise name.
+**IntelliJ IDEA.** Enable the Shell Script plugin and select **Java Piscine → Run**. The configuration runs the first quest exercise without a local pass, in PATH.md order. To switch exercises, set **Run → Edit Configurations → Java Piscine → Script options** to the exercise name.
+
+A successful run against the exercise in this checkout records a marker under `.piscine-progress/`, scoped to the tester image. Git ignores these markers. Failed runs never advance the sequence. Checkpoints, raids and official results are tracked on the Platform.
 
 The runner uses the verified local image and returns the tester’s exit code. If the image is missing, install it from the Zone01 release. Submit each solution as specified in its Platform brief and update your board.
 
