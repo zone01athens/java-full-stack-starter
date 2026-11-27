@@ -33,11 +33,14 @@ class PracticeTest(unittest.TestCase):
                 return subprocess.check_output([sys.executable, script, *args], env=env, text=True)
 
             record = ("record", "HelloWorld")
-            run(*record, "partial", "unobserved", "unobserved")
-            queue = root / ".ai-transcripts/review.sqlite3"
+            run(*record, "described_difficulty")
+            queue = root / ".ai-transcripts/events.sqlite3"
             self.assertFalse(queue.exists())
             env["PISCINE_REVIEW_OFF"] = "0"
-            run(*record, "partial", "unobserved", "unobserved")
+            run(*record, "predicted_result")
+            self.assertFalse(queue.exists())
+            self.assertIn("on", run("opt-in"))
+            run(*record, "described_difficulty")
             subprocess.run(["openssl", "req", "-x509", "-newkey", "rsa:2048", "-nodes",
                             "-days", "1", "-subj", "/CN=localhost", "-addext",
                             "subjectAltName=DNS:localhost", "-keyout", "key", "-out", "cert"],
@@ -47,7 +50,7 @@ class PracticeTest(unittest.TestCase):
             cohort = root / "cohort.sqlite3"
             db = sqlite3.connect(cohort, check_same_thread=False)
             self.addCleanup(db.close)
-            db.execute("CREATE TABLE samples(token TEXT PRIMARY KEY, framing INTEGER, decision INTEGER, verification INTEGER)")
+            db.execute("CREATE TABLE observations(token TEXT PRIMARY KEY, mask INTEGER)")
             with HTTPServer(("127.0.0.1", 0), practice.Intake) as server:
                 server.db = db
                 server.socket = tls.wrap_socket(server.socket, server_side=True)
@@ -58,24 +61,37 @@ class PracticeTest(unittest.TestCase):
                     env["PISCINE_REVIEW_INTAKE"] = url
                     run("sync")
                     run("sync")
-                    run(*record, "unobserved", "demonstrated", "partial")
-                    run(*record, "partial", "unobserved", "unobserved")
-                    self.assertEqual(db.execute("SELECT framing,decision,verification FROM samples").fetchall(), [(1, 2, 1)])
+                    run(*record, "asked_for_hint", "chose_experiment", "ran_check")
+                    run(*record, "described_difficulty")
+                    self.assertEqual(db.execute("SELECT mask FROM observations").fetchall(), [(29,)])
                     self.assertEqual(json.loads(run("report", cohort)), {"exercise_samples": 1})
+                    report = root / "report.json"
+                    run("report", cohort, "--output", report)
+                    self.assertEqual(json.loads(report.read_text()), {"exercise_samples": 1})
                     with self.assertRaises(HTTPError) as exc:
                         urlopen(Request(url, data=b'{"email":"private"}'),
                                 context=ssl.create_default_context(cafile=root / "cert"))
                     self.assertEqual(exc.exception.code, 400)
                     exc.exception.close()
                     for i in range(4):
-                        practice.accept(db, {"sample": format(i, "032x"), "scores": [0, 0, 0]})
+                        practice.accept(db, {"sample": format(i, "032x"), "events": 0})
                     self.assertEqual(json.loads(run("report", cohort))["decision"]["demonstrated"], 1)
                 finally:
                     server.shutdown()
                     thread.join()
-            run(*record, "demonstrated", "demonstrated", "demonstrated")
+            run(*record, "compared_result")
             with sqlite3.connect(queue) as local:
-                self.assertEqual(local.execute("SELECT pending FROM practice").fetchone(), (1,))
+                self.assertEqual(local.execute("SELECT pending FROM queue").fetchone(), (1,))
+            self.assertIn("off", run("opt-out"))
+            run(*record, "ran_check")
+            run("sync")
+            with sqlite3.connect(queue) as local:
+                self.assertEqual(local.execute("SELECT count(*) FROM queue").fetchone(), (0,))
+            self.assertIn("off", run("status"))
+            run("opt-in")
+            with sqlite3.connect(queue) as local:
+                self.assertEqual(local.execute("SELECT count(*) FROM queue").fetchone(), (0,))
+
 
 
 if __name__ == "__main__":

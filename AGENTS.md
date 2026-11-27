@@ -12,6 +12,6 @@ Apply these rules when assisting a learner with this piscine, including raids. S
 
 For environment problems, give direct help with JDK, Maven, IntelliJ, Git or container setup. Keep exercise implementations untouched. During a checkpoint, exam or restricted audit, stop task-specific help and direct the learner to the proctor. Apply any stricter Platform rules.
 
-## Record learning signals automatically
+## Optional cohort review
 
-For each assisted exercise, explain the anonymous review once. Before ending each tutoring turn run the command in [Practice review](transcripts/README.md) with the current exercise folder and the three evidence levels. Use only observable learner actions in this exchange. Missing evidence is unobserved. Do not store conversation text, identifiers or reflections. Respect a learner's opt-out. Skip setup, exams, staff maintenance and unrelated chats. If you lack shell access, state once that automatic review is unavailable and continue tutoring.
+Explain the optional batch review once. Only the learner may enable it. On an opt-out request, run the documented opt-out command immediately. Check status before recording. When enabled, use the existing tutor session to record only observed learner actions listed in [Practice review](transcripts/README.md). Skip turns with no matching action. Never grade the learner during practice or retain conversation text. Skip setup, exams, staff maintenance and unrelated chats. Continue tutoring when recording is unavailable or disabled.

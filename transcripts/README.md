@@ -1,38 +1,50 @@
-# Automatic practice review
+# Optional cohort review
 
-For automatic scoring on every completed turn, use the local tutor from the IntelliJ terminal. Install Ollama and a local model with structured-output support once. Run the Ollama service in local-only mode (OLLAMA_NO_CLOUD=1). Supply the installed model name:
+Use your usual coding assistant. You can complete every exercise with review switched off. Each checkout starts with collection disabled. To participate, run this once in the project terminal:
 
-    python3 tools/review/tutor.py HelloWorld --model MODEL
+    python3 tools/review/practice.py opt-in
 
-The tutor returns a hint and three rubric values together. The runner validates and records the values before displaying the hint. Dialogue stays in process memory. Type /exit to finish. This runner does not read the exercise source; paste the relevant attempt or error in the chat.
+Check or withdraw at any time:
 
-Other shell-enabled repository tutors can record the same levels by following AGENTS.md. The recorder accepts only an exercise folder and three fixed levels. No transcript is exported. The AI client may keep its own chat history under its own settings.
+    python3 tools/review/practice.py status
+    python3 tools/review/practice.py opt-out
 
-    python3 tools/review/practice.py record HelloWorld demonstrated partial unobserved
+Opt-out persists across restarts and clears the local delivery queue. Samples already delivered cannot be located by student identity. PISCINE_REVIEW_OFF=1 also suspends collection and delivery wherever the variable is set. Old score queues from earlier starter versions are ignored.
 
-Use the positions in this order:
+## During practice
 
-| Dimension | Partial | Demonstrated |
-| --- | --- | --- |
-| Framing | Identifies the difficulty | Gives expected and observed behavior or a specific prediction |
-| Decision | Requests a diagnostic hint | Chooses a next experiment and explains why |
-| Verification | Reports running a check | Compares its result with a prediction and explains the outcome |
+The existing shell-enabled tutor checks status, then records only actions it observed. Python 3 is sufficient. No model installation is required. Example:
 
-Use **unobserved** when evidence is missing. Score only the learner's contribution. Treat these as tutor estimates for cohort mentoring. Verify independent understanding separately with an unaided exercise.
+    python3 tools/review/practice.py record HelloWorld predicted_result ran_check
 
-## Automatic delivery
+| Action | Evidence from the learner |
+| --- | --- |
+| described_difficulty | Identified the specific difficulty |
+| predicted_result | Gave an expectation before a check |
+| asked_for_hint | Requested diagnostic guidance |
+| chose_experiment | Selected the next experiment |
+| ran_check | Reported running it |
+| compared_result | Compared an observation with a prediction |
 
-Python 3 is required. The ignored local queue retains the strongest observed level per dimension per exercise. An improved score updates the same random sample. Repeated delivery is safe. The tutor attempts delivery after each record. The IntelliJ/Maven tester retries queued changes on each run. Without an intake URL, records stay on the device. No personal commits, uploads or API keys are required.
+The device sends a random per-exercise token and a bit mask of observed actions. It sends no prompts, replies, names, exercise titles or grades. Repeated observations merge into the same sample. The tester retries queued deliveries. The tutor client's own chat history is separate. Browser-only chats cannot record through this mechanism.
 
-Staff: run the receiver on an access-controlled campus host with a database outside the checkout:
+## Staff batch
+
+Run the intake on a controlled campus host. Use a database outside the checkout:
 
     python3 tools/review/practice.py serve /var/lib/piscine-review/cohort.sqlite3
 
-Route HTTPS POST /samples to its loopback port 8765. Disable access logs and request tracing throughout the route, and verify infrastructure retention before enabling collection. Set PISCINE_REVIEW_INTAKE to the campus HTTPS URL in the tutor and IDE environments. The receiver stores a random exercise-sample token and three integers. It has no student account, exercise name, timestamp or text field. Different samples have independent tokens. The network edge can see the connection IP. Keep the receiver on the controlled network. Submissions are unauthenticated self-reports.
+Expose HTTPS POST /samples through a campus proxy to loopback port 8765. Verify access logging and tracing are disabled throughout the route before enabling collection. The network edge sees connection IPs. Configure PISCINE_REVIEW_INTAKE in the tutor and IDE environments. With no endpoint, observations remain local.
+
+Run this repeatable batch after the practice window. It calculates scores over all received samples from the event masks:
 
     python3 tools/review/practice.py report /var/lib/piscine-review/cohort.sqlite3
 
-The report counts exercise samples. Dimension breakdowns appear from five samples onward. One learner may contribute multiple samples. Review participation and scores cannot establish attendance, mastery or cohort membership. Set PISCINE_REVIEW_OFF=1 in the tutor and IDE environments to disable recording and delivery. Browser-only chats and clients that ignore repository instructions provide no automatic evidence.
+For a daily batch at 04:00 host time, install this entry in the receiver service account's crontab after deployment. Use the actual installation paths. The completed report replaces the previous file atomically.
+
+    0 4 * * * /usr/bin/python3 /opt/piscine/tools/review/practice.py report /var/lib/piscine-review/cohort.sqlite3 --output /var/lib/piscine-review/report.json
+
+Framing uses the first pair of actions, decision the second, verification the third. Zero observed actions yields unobserved, one partial, both demonstrated. These labels describe evidence within an exercise. They do not establish independent understanding or evaluate the original wording. Report totals count exercise samples; dimension counts appear from five samples. One learner may contribute multiple samples. Records are unauthenticated, tutor-reported signals.
 
 ## Why this design
 

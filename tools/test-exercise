@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 root=$(cd "$(dirname "$0")/.." && pwd)
-if [[ -n ${PISCINE_REVIEW_INTAKE:-} && -f "$root/.ai-transcripts/review.sqlite3" ]] && command -v python3 >/dev/null; then
+if [[ -n ${PISCINE_REVIEW_INTAKE:-} && -f "$root/.ai-transcripts/events.sqlite3" ]] && command -v python3 >/dev/null; then
   python3 "$root/tools/review/practice.py" sync || echo 'Practice review sync deferred.' >&2
 fi
 image=sha256:1d751b0b88796c175316ab234c483acf9faef11247b8c584f2422b781d1f1951
