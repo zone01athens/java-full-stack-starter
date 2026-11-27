@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -euo pipefail
+exercise=${1:-}
+if [[ ! $exercise =~ ^[A-Za-z][A-Za-z0-9_]*$ || $# -gt 2 ]]; then
+  echo 'Usage: tools/test-exercise HelloWorld [solution-folder]' >&2
+  exit 2
+fi
+root=$(cd "$(dirname "$0")/.." && pwd)
+folder=${2:-"$root/$exercise"}
+if ! compgen -G "$folder/*.java" >/dev/null; then
+  echo "Place the exercise .java files directly in $folder" >&2
+  exit 2
+fi
+folder=$(cd "$folder" && pwd)
+engine=${CONTAINER_ENGINE:-docker}
+if [[ -z ${CONTAINER_ENGINE:-} ]] && ! command -v docker >/dev/null && command -v podman >/dev/null; then
+  engine=podman
+fi
+image=sha256:1d751b0b88796c175316ab234c483acf9faef11247b8c584f2422b781d1f1951
+if ! command -v "$engine" >/dev/null; then
+  echo "Install $engine or set CONTAINER_ENGINE to an installed engine." >&2
+  exit 1
+fi
+if ! "$engine" info >/dev/null; then
+  echo "Start $engine and retry." >&2
+  exit 1
+fi
+if ! "$engine" image inspect "$image" >/dev/null 2>&1; then
+  echo 'Download the Zone01 tester in your signed-in browser:' >&2
+  echo 'https://github.com/zone01athens/java-piscine-tester/releases/tag/java-tester-a0f74962' >&2
+  echo "Verify the checksum, then run: $engine load -i java-piscine-tester-a0f74962.tar.gz" >&2
+  exit 1
+fi
+exec "$engine" run --pull=never --rm --platform linux/amd64 --network none \
+  -e "EXERCISE=$exercise" -v "$folder:/app/student/$exercise:ro,Z" "$image"
